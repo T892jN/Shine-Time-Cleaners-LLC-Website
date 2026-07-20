@@ -1,4 +1,9 @@
 (function () {
+  if (window.location.protocol !== "file:" && /\/index\.html$/.test(window.location.pathname)) {
+    window.location.replace(window.location.pathname.replace(/index\.html$/, "") + window.location.search + window.location.hash);
+    return;
+  }
+
   const header = document.querySelector("[data-header]");
   const navToggle = document.querySelector("[data-nav-toggle]");
   const navMenu = document.querySelector("[data-nav-menu]");
