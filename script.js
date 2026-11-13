@@ -35,6 +35,17 @@
     node.textContent = String(new Date().getFullYear());
   });
 
+  const textWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  let textNode;
+  while ((textNode = textWalker.nextNode())) textNodes.push(textNode);
+  textNodes.forEach((node) => {
+    node.nodeValue = node.nodeValue
+      .replace(/Request availability/g, "Contact details")
+      .replace(/requesting availability/g, "contacting us")
+      .replace(/contact@shinetimecleanersllc\.com/g, "Email unavailable");
+  });
+
   document.querySelectorAll("[data-accordion]").forEach((accordion) => {
     accordion.addEventListener("click", (event) => {
       const button = event.target.closest("button");
@@ -46,18 +57,4 @@
     });
   });
 
-  const revealItems = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    revealItems.forEach((item) => observer.observe(item));
-  } else {
-    revealItems.forEach((item) => item.classList.add("is-visible"));
-  }
 }());

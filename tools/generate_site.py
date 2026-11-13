@@ -355,6 +355,57 @@ terms_body = '''
 '''
 write("/terms-of-service/", page("Terms of Service | Shine Time Cleaners", "Terms of Service for Shine Time Cleaners covering website use, service requests, cleaning scope, customer responsibilities, and limitations.", "/terms-of-service/", "Terms", "Terms for using this website and requesting cleaning services.", "These terms explain how website information and residential cleaning requests should be understood.", terms_body))
 
-urls = ["/", "/about/", "/why-choose-us/", "/services/", "/service-areas/", "/standard-cleaning-guide/", "/deep-cleaning-guide/", "/move-out-cleaning-guide/", "/pet-friendly-cleaning/", "/seasonal-cleaning-tips/", "/house-cleaning-checklist/", "/apartment-cleaning-checklist/", "/pricing/", "/frequently-asked-questions/", "/faq/", "/contact/", "/privacy/", "/terms-of-service/"]
+def minimal_page(title, description, path, body):
+    prefix = "" if path == "/" else "../"
+    nav_html = (
+        f'<a href="{prefix or "./"}">Home</a>'
+        f'<a href="{prefix}services/">Services</a>'
+        f'<a href="{prefix}contact/">Contact</a>'
+    )
+    footer_html = f'''<footer class="site-footer"><div class="container footer-grid">
+      <div><a class="brand footer-brand" href="{prefix or "./"}"><span class="brand-mark" aria-hidden="true">ST</span><span><strong>Shine Time</strong><small>Cleaners</small></span></a></div>
+      <nav aria-label="Footer navigation">{nav_html}</nav>
+    </div><div class="container footer-bottom"><p>&copy; <span data-year></span> Shine Time Cleaners.</p></div></footer>'''
+    css = "style.css" if path == "/" else "../style.css"
+    js = "script.js" if path == "/" else "../script.js"
+    favicon = "favicon.svg" if path == "/" else "../favicon.svg"
+    return f'''<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{escape(title)}</title><meta name="description" content="{escape(description)}">
+  <link rel="icon" href="{favicon}" type="image/svg+xml"><link rel="stylesheet" href="{css}">
+</head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><nav class="nav container" aria-label="Primary navigation">
+  <a class="brand" href="{prefix or "./"}" aria-label="Shine Time Cleaners home"><span class="brand-mark" aria-hidden="true">ST</span><span><strong>Shine Time</strong><small>Cleaners</small></span></a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu" data-nav-toggle><span></span><span></span><span></span><span class="sr-only">Menu</span></button>
+  <div class="nav-menu" id="primary-menu" data-nav-menu>{nav_html}</div></nav></header>
+  <main id="main">{body}</main>{footer_html}<script src="{js}"></script></body></html>'''
+
+minimal_home = '''<section class="hero section-pad"><div class="container hero-grid">
+  <div class="hero-copy"><p class="eyebrow">Shine Time Cleaners</p><h1>Residential cleaning services.</h1>
+  <p class="hero-text">Cleaning help for homes and apartments. Call to ask about availability and service options.</p>
+  <div class="hero-actions"><a class="btn btn-primary" href="contact/">Contact us</a><a class="btn btn-secondary" href="services/">View services</a></div></div>
+  <div class="hero-visual"><img src="images/hero.svg" alt="Cleaning supplies and a tidy home"></div>
+</div></section>'''
+minimal_services = '''<section class="page-hero"><div class="container"><p class="eyebrow">Services</p><h1>Cleaning services</h1><p>Choose the type of cleaning you need, then call to discuss the details.</p></div></section>
+<section class="section-pad"><div class="container service-card-grid">
+  <article class="service-card"><img src="../images/kitchen.svg" alt="Kitchen cleaning"><h2>Standard cleaning</h2><p>Routine cleaning for commonly used rooms and surfaces.</p></article>
+  <article class="service-card"><img src="../images/supplies.svg" alt="Cleaning supplies"><h2>Deep cleaning</h2><p>More detailed cleaning for areas that need extra attention.</p></article>
+  <article class="service-card"><img src="../images/hero.svg" alt="Empty room ready for cleaning"><h2>Move-out cleaning</h2><p>Cleaning for a home or apartment before moving out.</p></article>
+  <article class="service-card"><img src="../images/bedroom.svg" alt="Clean bedroom"><h2>Pet-friendly cleaning</h2><p>Cleaning for homes where pets live.</p></article>
+</div></section>'''
+minimal_contact = '''<section class="page-hero"><div class="container"><p class="eyebrow">Contact</p><h1>Call Shine Time Cleaners.</h1><p>For questions, availability, or service details, call the number below.</p></div></section>
+<section class="section-pad"><div class="container split"><div class="contact-panel"><h2>Phone</h2><p><a class="btn btn-primary" href="tel:+16366754074">(636)-675-4074</a></p></div>
+<form class="contact-form" action="#" method="post"><h2>Sign in</h2><p class="fine-print">This form is not connected yet.</p><label>Email<input name="email" type="email" autocomplete="email"></label><label>Password<input name="password" type="password" autocomplete="current-password"></label></form></div></section>'''
+
+write("/", minimal_page("Shine Time Cleaners", "Residential cleaning services.", "/", minimal_home))
+write("/services/", minimal_page("Cleaning Services | Shine Time Cleaners", "Cleaning services from Shine Time Cleaners.", "/services/", minimal_services))
+write("/contact/", minimal_page("Contact Shine Time Cleaners", "Contact Shine Time Cleaners by phone.", "/contact/", minimal_contact))
+
+removed_body = '''<section class="page-hero"><div class="container"><h1>This page is no longer available.</h1><p>Return to the home page or call Shine Time Cleaners at <a href="tel:+16366754074">(636)-675-4074</a>.</p></div></section>'''
+for old_path in ["/about/", "/why-choose-us/", "/service-areas/", "/standard-cleaning-guide/", "/deep-cleaning-guide/", "/move-out-cleaning-guide/", "/pet-friendly-cleaning/", "/seasonal-cleaning-tips/", "/house-cleaning-checklist/", "/apartment-cleaning-checklist/", "/pricing/", "/frequently-asked-questions/", "/faq/"]:
+    write(old_path, minimal_page("Page removed | Shine Time Cleaners", "This page is no longer available.", old_path, removed_body))
+
+urls = ["/", "/services/", "/contact/"]
 (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'  <url><loc>{DOMAIN}{u}</loc></url>\n' for u in urls) + '</urlset>\n', encoding="utf-8")
 (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {DOMAIN}/sitemap.xml\n", encoding="utf-8")
+(ROOT / "privacy" / "index.html").unlink(missing_ok=True)
+(ROOT / "terms-of-service" / "index.html").unlink(missing_ok=True)
